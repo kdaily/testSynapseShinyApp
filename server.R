@@ -17,21 +17,23 @@ shinyServer(function(input, output, session) {
   session$sendCustomMessage(type="readCookie",
                             message=list(name='org.sagebionetworks.security.user.login.token'))
   
-  foo <- reactive(synapseLogin(sessionToken=input$cookie))
-
-  output$title <- renderUI({
-    titlePanel(sprintf("Welcome, %s", synGetUserProfile()@userName))
-  })
+  foo <- observeEvent(input$cookie, {
   
-  output$distPlot <- renderPlot({
+    synapseLogin(sessionToken=input$cookie)
 
-    # generate bins based on input$bins from ui.R
-    x    <- faithful[, 2]
-    bins <- seq(min(x), max(x), length.out = input$bins + 1)
+    output$title <- renderUI({
+      titlePanel(sprintf("Welcome, %s", synGetUserProfile()@userName))
+    })
+  
+    output$distPlot <- renderPlot({
 
-    # draw the histogram with the specified number of bins
-    hist(x, breaks = bins, col = 'darkgray', border = 'white')
+      # generate bins based on input$bins from ui.R
+      x    <- faithful[, 2]
+      bins <- seq(min(x), max(x), length.out = input$bins + 1)
 
+      # draw the histogram with the specified number of bins
+      hist(x, breaks = bins, col = 'darkgray', border = 'white')
+
+    })
   })
-
 })
